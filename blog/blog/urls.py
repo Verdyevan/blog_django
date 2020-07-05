@@ -22,7 +22,8 @@ from myblog import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('blog/', views.blog, name='blog')
+    path('blog/<int:blog_id>/', views.blog, name='blog'),
+    path('search', views.search, name='search')
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

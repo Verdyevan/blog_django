@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<body>
+
+<h2>This is the results of your search</h2>
+{% for result in queryset %}
+    <a href="{{ result.get_absolute_url }}">{{ result.title }}</a>
+    <br />
+{% endfor %}
+
+  <!-- Footer -->
+  <footer class="py-5 bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white">Copyright &copy; Your Website 2020</p>
+    </div>
+    <!-- /.container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="{% static 'myblog/home-post/vendor/jquery/jquery.min.js' %}"></script>
+  <script src="{% static 'myblog/home-post/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+</body>
+
+{% endblock content %}

@@ -1,7 +1,14 @@
-from django.shortcuts import render
-from .models import Post
+from django.shortcuts import render, get_object_or_404, redirect, reverse
+from .models import Post, Author
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from .forms import CommentForm, PostForm
+
+def get_author(user):
+    qs = Author.objects.filter(user=user)
+    if qs.exists():
+        return qs[0]
+    return None
 
 def search(request):
     queryset = Post.objects.all()
@@ -37,4 +44,56 @@ def index(request):
 
 #1
 def blog(request, blog_id):
-    return render(request, 'blog.html')
+    blog = get_object_or_404(Post, id=blog_id)
+    form = CommentForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            form.instance.user = request.user
+            form.instance.post = blog
+            form.save()
+            return redirect('blog', blog_id=blog_id)
+    context = {
+        'blog': blog,
+        'form': form,
+    }
+    return render(request, 'blog.html', context)
+
+def blog_create(request):
+    title = 'Create'
+    form = PostForm(request.POST or None, request.FILES or None)
+    author = get_author(request.user)
+    if request.method == "POST":
+        if form.is_valid():
+            form.instance.author = author
+            form.save()
+            return redirect(reverse("blog", kwargs={
+                'blog_id': form.instance.id
+            }))
+    context = {
+        'title': title,
+        'form': form
+    }
+    return render(request, "post_create.html", context)
+
+def blog_update(request, blog_id):
+    title = 'Update'
+    blog = get_object_or_404(Post, id=blog_id)
+    form = PostForm(request.POST or None, request.FILES or None, instance=blog)
+    author = get_author(request.user)
+    if request.method == "POST":
+        if form.is_valid():
+            form.instance.author = author
+            form.save()
+            return redirect(reverse("blog", kwargs={
+                'blog_id': form.instance.id
+            }))
+    context = {
+        'title': title,
+        'form': form
+    }
+    return render(request, "post_create.html", context)
+
+def blog_delete(request, blog_id):
+    blog = get_object_or_404(Post, id=blog_id)
+    blog.delete()
+    return redirect("index")

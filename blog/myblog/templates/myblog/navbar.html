@@ -14,9 +14,12 @@
           <span class="sr-only">(current)</span>
         </a>
       </li>
-      {% if request.user.is_staff %}
+      {% if request.user.is_authenticated %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'blog_create' %}">Create</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'add_category' %}">Add Category</a>
       </li>
       {% endif %}
       <li class="nav-item">

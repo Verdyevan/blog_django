@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect, reverse
-from .models import Post, Author
+from .models import Post, Author, Category
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from .forms import CommentForm, PostForm
+from django.views.generic import CreateView
 
 def get_author(user):
     qs = Author.objects.filter(user=user)
@@ -25,6 +26,7 @@ def search(request):
 
 #1
 def index(request):
+    categories = Category.objects.all()
     queryset = Post.objects.all()
     paginator = Paginator(queryset, 2)
     page_request_var = 'page'
@@ -37,6 +39,7 @@ def index(request):
         paginated_queryset = paginator.page(paginator.num_pages)
 
     context = {
+        'categories': categories,
         'queryset': paginated_queryset,
         'page_request_var': page_request_var
     }
@@ -97,3 +100,16 @@ def blog_delete(request, blog_id):
     blog = get_object_or_404(Post, id=blog_id)
     blog.delete()
     return redirect("index")
+
+def CategoryView(request, cats):
+    category_post = Post.objects.filter(categories__title__contains=cats)
+    context = {
+        'cats': cats,
+        'category_post': category_post
+    }
+    return render(request, 'categories.html', context)
+
+class AddCategoryView(CreateView):
+    model = Category
+    template_name = 'add_category.html'
+    fields = '__all__'
